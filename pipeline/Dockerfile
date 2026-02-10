@@ -14,6 +14,11 @@ RUN uv sync --frozen --no-dev
 
 ENV PATH="/app/.venv/bin:$PATH"
 
-COPY . .
+COPY pyproject.toml .python-version uv.lock /
 
-CMD ["python", "pipeline.py", "1"]
+RUN pip install pandas pyarrow
+RUN uv sync --locked
+
+COPY ingest_data.py .
+
+ENTRYPOINT ["python", "ingest_data.py"]
