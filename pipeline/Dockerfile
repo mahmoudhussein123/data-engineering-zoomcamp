@@ -1,22 +1,10 @@
-FROM python:3.13-slim
+FROM python:3.13.11-slim
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/
 
-WORKDIR /app
+WORKDIR /code
+ENV PATH="/code/.venv/bin:$PATH"
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1
-
-RUN pip install --no-cache-dir uv
-
-COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev
-
-ENV PATH="/app/.venv/bin:$PATH"
-
-COPY pyproject.toml .python-version uv.lock /
-
-RUN pip install pandas pyarrow
+COPY pyproject.toml .python-version uv.lock ./
 RUN uv sync --locked
 
 COPY ingest_data.py .
